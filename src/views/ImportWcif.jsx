@@ -1,11 +1,14 @@
 import React, { Component } from 'react';
 import { Row, Col, Button, Alert } from 'react-bootstrap';
+import { Redirect } from 'react-router-dom'
+import { withWcif } from '../wcif-context';
 
-export class ImportWcif extends Component {
+class ImportWcifRaw extends Component {
   componentWillMount() {
     this.setState({
       currentFile: null,
       error: null,
+      didit: false,
     });
   }
 
@@ -18,32 +21,43 @@ export class ImportWcif extends Component {
   }
 
   loadWcif = () => {
-    let { loader } = this.props;
-    if (!loader(this.state.currentFile)) {
+    let { wcifUpdater } = this.props;
+    let fr = new FileReader();
+    let stateSetter = () => {
+      this.setState({ didit: true });
+    }
+    fr.onload = function(e) {
+      wcifUpdater.importWcif(JSON.parse(e.target.result), stateSetter);
+    };
+    if (this.state.currentFile) {
+      fr.readAsText(this.state.currentFile);
+    } else {
       this.setState({ error: "File is empty." });
     }
   }
 
   render() {
-    let disclaimer, error = null;
-    if (this.props.wcif) {
-      disclaimer = (<Col xs={12}>
-        <Alert bsStyle="warning">
-          A WCIF is already loaded, importing a WCIF will erase all changes.
-        </Alert>
-      </Col>);
-    }
-    if (this.state.error) {
-      error = (
-        <Col xs={12}>
-          <Alert bsStyle="danger">{this.state.error}</Alert>
-        </Col>
-      );
-    }
     return (
       <Row>
-        {disclaimer}
-        {error}
+        <Col xs={12}>
+          {this.props.wcif ? (
+            <Alert bsStyle="warning">
+              A WCIF is already loaded, importing a WCIF will erase all changes.
+            </Alert>
+          ) : (
+            <Alert bsStyle="info">
+              Please load a WCIF to start working on it.
+            </Alert>
+          )}
+        </Col>
+        {this.state.error &&
+          <Col xs={12}>
+            <Alert bsStyle="danger">{this.state.error}</Alert>
+          </Col>
+        }
+        {this.state.didit &&
+          <Redirect to="/"/>
+        }
         <Col xs={3}>
           Select a file:
         </Col>
@@ -58,6 +72,8 @@ export class ImportWcif extends Component {
   }
 }
 
+export const ImportWcif = withWcif(ImportWcifRaw);
+
 class LoadingButton extends React.Component {
   constructor(props, context) {
     super(props, context);
@@ -70,10 +86,8 @@ class LoadingButton extends React.Component {
   handleClick = () => {
     this.setState({ isLoading: true });
     const { action } = this.props;
-    let didit = action();
-    if (!didit) {
-      this.setState({ isLoading: false });
-    }
+    action();
+    this.setState({ isLoading: false });
   }
 
   render() {

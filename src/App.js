@@ -1,86 +1,75 @@
 import React, { Component } from 'react';
 import fontawesome from '@fortawesome/fontawesome'
-import FontAwesomeIcon from '@fortawesome/react-fontawesome'
 import allIcons from '@fortawesome/fontawesome-free-solid'
+import allIconsRegular from '@fortawesome/fontawesome-free-regular'
 
 import './App.css';
 import { MainNav } from './navs/MainNav';
-import { UserView, RegistrationsView } from './views/UserViews';
-import { ImportWcif } from './views/WcifViews';
-import { CompetitionInfoView } from './views/CompetitionViews';
+import { UserProfile } from './views/User';
+import { Registrations } from './views/Registrations';
+import { ImportWcif } from './views/ImportWcif';
+import { WcifUpdater } from './apis/WcifAPI';
+import { withWcif, WcifContext } from './wcif-context';
+import { CompetitionInfo } from './views/CompetitionInfo';
+import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 
-fontawesome.library.add(allIcons)
+fontawesome.library.add(allIcons, allIconsRegular)
+
+const RoutedApp = ({ wcif, basename }) => {
+  return (
+    <BrowserRouter basename={basename}>
+      <App wcif={wcif} />
+    </BrowserRouter>
+  );
+}
+const NotFound = withWcif(({ wcif }) => (
+  <div>
+    <h1>Sorry but there is no matching page.</h1>
+    {!wcif &&
+      <Redirect to="/import" />
+    }
+  </div>
+));
+
+const RouteWithValidWcif = withWcif(({ wcif, component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    wcif
+      ? <Component {...props} />
+      : <Redirect to='/import' />
+  )} />
+));
+
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
-      activePage: "wcif",
-      selected: {
-        userId: null,
-        group: null,
-      },
       wcif: props.wcif,
+      wcifUpdater: new WcifUpdater(this),
     };
-    if (props.wcif) {
-      this.state.activePage = "competition.info";
-    }
-  }
-
-  loadWcif = fileToLoad => {
-    let fr = new FileReader();
-    let component = this;
-    fr.onload = function(e) {
-      component.setState({
-        wcif: JSON.parse(e.target.result),
-        activePage: "competition.info",
-      });
-    };
-    if (fileToLoad) {
-      fr.readAsText(fileToLoad);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
-  handleStateChange = state => {
-    this.setState(state);
   }
 
   render() {
     //https://github.com/kolodny/immutability-helper
     //look into filereader
-    let activeView = null;
-    let activePage = this.state.activePage;
-    switch (activePage) {
-      case "wcif":
-      case "wcif.import":
-        activeView = <ImportWcif wcif={this.state.wcif} loader={this.loadWcif} />;
-        break;
-      case "user-profile":
-        activeView = <UserView userId={this.state.selected.userId} wcif={this.state.wcif} />;
-        activePage = "competition";
-        break;
-      case "competition.info":
-        activeView = <CompetitionInfoView wcif={this.state.wcif} />;
-        break;
-      case "competition.registrations":
-        activeView = <RegistrationsView wcif={this.state.wcif} setter={this.handleStateChange} />;
-        break;
-      default:
-        activeView = <div>"coucou"</div>
-        break;
-    }
+    //look into this: https://github.com/reactjs/redux/blob/master/docs/introduction/Examples.md
     return (
       <div className="App">
-        <header>
-          <MainNav wcif={this.state.wcif} activePage={activePage} setter={this.handleStateChange} />
-        </header>
-        {activeView}
+        <WcifContext.Provider value={{ wcif: this.state.wcif, wcifUpdater: this.state.wcifUpdater }}>
+          <header>
+            <MainNav />
+          </header>
+          <Switch>
+            <RouteWithValidWcif exact path="/" component={CompetitionInfo} />
+            <Route exact path='/import' component={ImportWcif}/>
+            <RouteWithValidWcif exact path='/users/:userId' component={UserProfile}/>
+            <RouteWithValidWcif exact path='/registrations' component={Registrations}/>
+            <Route component={NotFound}/>
+          </Switch>
+        </WcifContext.Provider>
       </div>
     );
   }
 }
 
-export default App;
+export default RoutedApp;

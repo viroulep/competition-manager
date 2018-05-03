@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 import { Row, Col } from 'react-bootstrap';
+import { withWcif } from '../wcif-context';
 
 const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
-export class CompetitionInfoView extends Component {
+class CompetitionInfoRaw extends Component {
+
   render() {
     let { wcif } = this.props;
     let startDate = new Date(wcif.schedule.startDate);
@@ -39,3 +41,5 @@ export class CompetitionInfoView extends Component {
     );
   }
 }
+
+export const CompetitionInfo = withWcif(CompetitionInfoRaw);

@@ -6,7 +6,7 @@ import registerServiceWorker from './registerServiceWorker';
 
 window.wca = window.wca || {};
 
-window.wca.initCompetitionScheduler = (wcif) => {
-  ReactDOM.render(<App wcif={wcif} />, document.getElementById('root'));
+window.wca.initCompetitionScheduler = (wcif, basename) => {
+  ReactDOM.render(<App wcif={wcif} basename={basename} />, document.getElementById('root'));
   registerServiceWorker();
 }

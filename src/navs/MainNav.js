@@ -1,39 +1,44 @@
 import React, { Component } from 'react';
 import { NavItem, Nav, NavDropdown, MenuItem } from 'react-bootstrap';
+import { IndexLinkContainer, LinkContainer } from 'react-router-bootstrap';
 import FileSaver from 'file-saver';
+import FontAwesomeIcon from '@fortawesome/react-fontawesome'
+import { withWcif } from '../wcif-context';
 
 function exportWcif(wcif) {
   var blob = new Blob([JSON.stringify(wcif)], {type: "text/plain;charset=utf-8"});
   FileSaver.saveAs(blob, "wcif.json");
 }
 
-export class MainNav extends Component {
+class MainNavRaw extends Component {
 
   render() {
-    let { activePage, setter, wcif } = this.props;
-    let handlePageChange = function(key) {
-      if (key === "wcif.export") {
-        exportWcif(wcif);
-      } else {
-        setter({ activePage: key });
-      }
-    };
+    let { wcif } = this.props;
     return (
       <Nav
         bsStyle="tabs"
         justified
-        activeKey={activePage}
-        onSelect={handlePageChange}
       >
-        <NavDropdown eventKey="competition" id="mainnav-competition" title="Competition">
-          <MenuItem eventKey="competition.info">Information</MenuItem>
-          <MenuItem eventKey="competition.events">Events</MenuItem>
-          <MenuItem eventKey="competition.schedule">Schedule</MenuItem>
-          <MenuItem eventKey="competition.registrations">Registrations</MenuItem>
+        <NavDropdown id="mainnav-competition" title="Competition">
+          <IndexLinkContainer to="/">
+            <MenuItem><FontAwesomeIcon icon='info' /> Information</MenuItem>
+          </IndexLinkContainer>
+          <MenuItem eventKey="competition.events"><FontAwesomeIcon icon='cubes' /> Events</MenuItem>
+          <MenuItem eventKey="competition.schedule"><FontAwesomeIcon icon={['far', 'calendar']} /> Schedule</MenuItem>
+          <LinkContainer to="/registrations">
+            <MenuItem><FontAwesomeIcon icon='list-ol' /> Registrations</MenuItem>
+          </LinkContainer>
         </NavDropdown>
-        <NavItem eventKey="staff-teams">
-          Staff teams
-        </NavItem>
+        <LinkContainer to="/teams">
+          <NavItem>
+            Teams
+          </NavItem>
+        </LinkContainer>
+        <LinkContainer to="/competition">
+          <NavItem>
+            Infos
+          </NavItem>
+        </LinkContainer>
         <NavItem eventKey="groups">
           Groups
         </NavItem>
@@ -41,10 +46,14 @@ export class MainNav extends Component {
           Staff schedule
         </NavItem>
         <NavDropdown eventKey="wcif" id="mainnav-wcif" title="WCIF">
-          <MenuItem eventKey="wcif.import">Import a WCIF</MenuItem>
-          <MenuItem eventKey="wcif.export">Export the current WCIF</MenuItem>
+          <LinkContainer to="/import">
+            <MenuItem>Import a WCIF</MenuItem>
+          </LinkContainer>
+          <MenuItem onClick={e => { exportWcif(wcif) }}>Export the current WCIF</MenuItem>
         </NavDropdown>
       </Nav>
     );
   }
 }
+
+export const MainNav = withWcif(MainNavRaw);
