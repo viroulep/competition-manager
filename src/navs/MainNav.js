@@ -24,7 +24,9 @@ class MainNavRaw extends Component {
             <MenuItem><FontAwesomeIcon icon='info' /> Information</MenuItem>
           </IndexLinkContainer>
           <MenuItem eventKey="competition.events"><FontAwesomeIcon icon='cubes' /> Events</MenuItem>
-          <MenuItem eventKey="competition.schedule"><FontAwesomeIcon icon={['far', 'calendar']} /> Schedule</MenuItem>
+          <LinkContainer to="/schedule">
+            <MenuItem><FontAwesomeIcon icon={['far', 'calendar']} /> Schedule</MenuItem>
+          </LinkContainer>
           <LinkContainer to="/registrations">
             <MenuItem><FontAwesomeIcon icon='list-ol' /> Registrations</MenuItem>
           </LinkContainer>

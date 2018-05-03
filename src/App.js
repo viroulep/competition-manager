@@ -3,7 +3,6 @@ import fontawesome from '@fortawesome/fontawesome'
 import allIcons from '@fortawesome/fontawesome-free-solid'
 import allIconsRegular from '@fortawesome/fontawesome-free-regular'
 
-import './App.css';
 import { MainNav } from './navs/MainNav';
 import { UserProfile } from './views/User';
 import { Registrations } from './views/Registrations';
@@ -11,7 +10,11 @@ import { ImportWcif } from './views/ImportWcif';
 import { WcifUpdater } from './apis/WcifAPI';
 import { withWcif, WcifContext } from './wcif-context';
 import { CompetitionInfo } from './views/CompetitionInfo';
+import { CompetitionSchedule } from './views/schedule/CompetitionSchedule';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+
+// npm rebuild node-sass
+import './scss/App.scss';
 
 fontawesome.library.add(allIcons, allIconsRegular)
 
@@ -64,6 +67,7 @@ class App extends Component {
             <Route exact path='/import' component={ImportWcif}/>
             <RouteWithValidWcif exact path='/users/:userId' component={UserProfile}/>
             <RouteWithValidWcif exact path='/registrations' component={Registrations}/>
+            <RouteWithValidWcif exact path='/schedule' component={CompetitionSchedule}/>
             <Route component={NotFound}/>
           </Switch>
         </WcifContext.Provider>
