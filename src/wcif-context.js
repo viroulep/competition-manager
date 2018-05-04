@@ -1,4 +1,5 @@
 import React from 'react';
+import { Route, Redirect } from 'react-router-dom';
 
 export const WcifContext = React.createContext({
   wcif: null,
@@ -18,3 +19,11 @@ export function withWcif(Component) {
     );
   };
 }
+
+export const RouteWithValidWcif = withWcif(({ wcif, component: Component, ...rest }) => (
+  <Route {...rest} render={(props) => (
+    wcif
+      ? <Component {...props} />
+      : <Redirect to='/import' />
+  )} />
+));

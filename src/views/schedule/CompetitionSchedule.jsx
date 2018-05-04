@@ -3,7 +3,6 @@ import _ from 'lodash';
 import { Row, Col } from 'react-bootstrap';
 import { withWcif } from '../../wcif-context';
 
-const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 class CompetitionScheduleRaw extends Component {
 

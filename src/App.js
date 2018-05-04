@@ -8,10 +8,14 @@ import { UserProfile } from './views/User';
 import { Registrations } from './views/Registrations';
 import { ImportWcif } from './views/ImportWcif';
 import { WcifUpdater } from './apis/WcifAPI';
-import { withWcif, WcifContext } from './wcif-context';
+import { withWcif, WcifContext, RouteWithValidWcif } from './wcif-context';
 import { CompetitionInfo } from './views/CompetitionInfo';
 import { CompetitionSchedule } from './views/schedule/CompetitionSchedule';
+import { GroupsNav } from './views/groups/Groups';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
+
+import { IntlProvider } from 'react-intl';
+import { t, localesData } from './i18n'
 
 // npm rebuild node-sass
 import './scss/App.scss';
@@ -34,19 +38,12 @@ const NotFound = withWcif(({ wcif }) => (
   </div>
 ));
 
-const RouteWithValidWcif = withWcif(({ wcif, component: Component, ...rest }) => (
-  <Route {...rest} render={(props) => (
-    wcif
-      ? <Component {...props} />
-      : <Redirect to='/import' />
-  )} />
-));
-
 class App extends Component {
 
   constructor(props) {
     super(props);
     this.state = {
+      locale: "en",
       wcif: props.wcif,
       wcifUpdater: new WcifUpdater(this),
     };
@@ -56,22 +53,32 @@ class App extends Component {
     //https://github.com/kolodny/immutability-helper
     //look into filereader
     //look into this: https://github.com/reactjs/redux/blob/master/docs/introduction/Examples.md
+    //dragula
+    //fullcalendar v4 alpha
+    //demos:https://github.com/fullcalendar/fullcalendar/blob/jquery-removal/demos/locales.html
     return (
-      <div className="App">
-        <WcifContext.Provider value={{ wcif: this.state.wcif, wcifUpdater: this.state.wcifUpdater }}>
-          <header>
-            <MainNav />
-          </header>
-          <Switch>
-            <RouteWithValidWcif exact path="/" component={CompetitionInfo} />
-            <Route exact path='/import' component={ImportWcif}/>
-            <RouteWithValidWcif exact path='/users/:userId' component={UserProfile}/>
-            <RouteWithValidWcif exact path='/registrations' component={Registrations}/>
-            <RouteWithValidWcif exact path='/schedule' component={CompetitionSchedule}/>
-            <Route component={NotFound}/>
-          </Switch>
-        </WcifContext.Provider>
-      </div>
+      <IntlProvider locale={this.state.locale}
+                    key={this.state.locale}
+                    defaultLocale="en"
+                    messages={localesData[this.state.locale]}
+      >
+        <div className="App">
+          <WcifContext.Provider value={{ wcif: this.state.wcif, wcifUpdater: this.state.wcifUpdater }}>
+            <header>
+              <MainNav />
+            </header>
+            <Switch>
+              <RouteWithValidWcif exact path="/" component={CompetitionInfo} />
+              <Route exact path='/import' component={ImportWcif}/>
+              <RouteWithValidWcif exact path='/users/:userId' component={UserProfile}/>
+              <RouteWithValidWcif exact path='/registrations' component={Registrations}/>
+              <RouteWithValidWcif exact path='/schedule' component={CompetitionSchedule}/>
+              <RouteWithValidWcif path='/groups' component={GroupsNav}/>
+              <Route component={NotFound}/>
+            </Switch>
+          </WcifContext.Provider>
+        </div>
+      </IntlProvider>
     );
   }
 }

@@ -41,9 +41,11 @@ class MainNavRaw extends Component {
             Infos
           </NavItem>
         </LinkContainer>
-        <NavItem eventKey="groups">
-          Groups
-        </NavItem>
+        <LinkContainer to="/groups">
+          <NavItem eventKey="groups">
+            Groups
+          </NavItem>
+        </LinkContainer>
         <NavItem eventKey="staff-schedule">
           Staff schedule
         </NavItem>

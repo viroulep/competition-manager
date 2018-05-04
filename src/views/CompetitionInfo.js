@@ -2,8 +2,9 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import { Row, Col } from 'react-bootstrap';
 import { withWcif } from '../wcif-context';
+import { formatDate } from '../utils/date';
+import { t, l } from '../i18n'
 
-const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 class CompetitionInfoRaw extends Component {
 
@@ -20,15 +21,15 @@ class CompetitionInfoRaw extends Component {
         <h1>{wcif.name}</h1>
         <Row>
           <Col xs={3}>
-            Date:
+            { t("competition.information.date") }
           </Col>
           <Col xs={9} className="text-left">
             <p>
-              From {startDate.toLocaleDateString('en', dateOptions)} to {endDate.toLocaleDateString('en', dateOptions)}.
+              { t("competition.information.datespan", { startDate: l(startDate), endDate: l(endDate)}) }
             </p>
           </Col>
           <Col xs={3}>
-            Organizers:
+            { t("competition.information.organizers") }
           </Col>
           <Col xs={9} className="text-left">
             {organizers.map((organizer, index) => {

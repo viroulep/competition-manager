@@ -49,7 +49,7 @@
          wcif = JSON.parse(xmlhttp.responseText);
         }
       };
-      xmlhttp.open("GET","wcif.json",true);
+      xmlhttp.open("GET","/wcif.json",true);
       xmlhttp.send();
       window.addEventListener("load", function() {
         window.wca.initCompetitionScheduler(wcif, "");

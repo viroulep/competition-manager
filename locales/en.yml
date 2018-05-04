@@ -1,0 +1,6 @@
+en:
+  competition:
+    information:
+      date: "Date:"
+      datespan: "From {startDate} to {endDate}."
+      organizers: "Organizers"
