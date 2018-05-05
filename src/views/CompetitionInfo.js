@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 import { Row, Col } from 'react-bootstrap';
 import { withWcif } from '../wcif-context';
-import { formatDate } from '../utils/date';
 import { t, l } from '../i18n'
 
 

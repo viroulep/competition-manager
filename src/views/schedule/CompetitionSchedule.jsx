@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import _ from 'lodash';
 import { Row, Col } from 'react-bootstrap';
 import { withWcif } from '../../wcif-context';
 
@@ -7,7 +6,7 @@ import { withWcif } from '../../wcif-context';
 class CompetitionScheduleRaw extends Component {
 
   render() {
-    let { wcif } = this.props;
+    //let { wcif } = this.props;
     return (
       <div>
         <h1>Schedule</h1>

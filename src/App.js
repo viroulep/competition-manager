@@ -15,7 +15,7 @@ import { GroupsNav } from './views/groups/Groups';
 import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 
 import { IntlProvider } from 'react-intl';
-import { t, localesData } from './i18n'
+import { localesData } from './i18n'
 
 // npm rebuild node-sass
 import './scss/App.scss';
