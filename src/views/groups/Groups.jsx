@@ -5,6 +5,8 @@ import _ from 'lodash';
 import { RouteWithValidWcif, withWcif } from '../../wcif-context';
 import { t } from '../../i18n'
 import { getActivitiesForRound, venueWcifFromId } from '../../utils/wcif';
+import { Calendar } from 'fullcalendar';
+import 'fullcalendar-scheduler';
 
 class GroupsNavRaw extends Component {
 
@@ -94,27 +96,86 @@ class GroupsPanelFindANewName extends Component {
     });
   }
 
+  componentDidMount() {
+    var calendarEl = document.getElementById('calendar');
+    var calendar = new Calendar(calendarEl, {
+      defaultView: 'agendaDay',
+      defaultDate: '2018-04-07',
+      editable: true,
+      selectable: true,
+      eventLimit: true, // allow "more" link when too many events
+      header: {
+        left: 'prev,next today',
+        center: 'title',
+        right: 'agendaDay,agendaTwoDay,agendaWeek,month'
+      },
+      views: {
+        agendaTwoDay: {
+          type: 'agenda',
+          duration: { days: 2 },
+          // views that are more than a day will NOT do this behavior by default
+          // so, we need to explicitly enable it
+          groupByResource: true
+            //// uncomment this line to group by day FIRST with resources underneath
+            //groupByDateAndResource: true
+        }
+      },
+        //// uncomment this line to hide the all-day slot
+        //allDaySlot: false,
+      resources: [
+      { id: 'a', title: 'Room A' },
+      { id: 'b', title: 'Room B', eventColor: 'green' },
+      { id: 'c', title: 'Room C', eventColor: 'orange' },
+        { id: 'd', title: 'Room D', eventColor: 'red' }
+      ],
+      events: [
+      { id: '1', resourceId: 'a', start: '2018-04-06', end: '2018-04-08', title: 'event 1' },
+      { id: '2', resourceId: 'a', start: '2018-04-07T09:00:00', end: '2018-04-07T14:00:00', title: 'event 2' },
+      { id: '3', resourceId: 'b', start: '2018-04-07T12:00:00', end: '2018-04-08T06:00:00', title: 'event 3' },
+        { id: '4', resourceId: 'c', start: '2018-04-07T07:30:00', end: '2018-04-07T09:30:00', title: 'event 4' },
+        { id: '5', resourceId: 'd', start: '2018-04-07T10:00:00', end: '2018-04-07T15:00:00', title: 'event 5' }
+      ],
+      select: function(start, end, jsEvent, view, resource) {
+        console.log(
+            'select',
+            start.format(),
+            end.format(),
+            resource ? resource.id : '(no resource)'
+            );
+      },
+      dayClick: function(date, jsEvent, view, resource) {
+        console.log(
+            'dayClick',
+            date.format(),
+            resource ? resource.id : '(no resource)'
+            );
+      }
+    });
+    calendar.render();
+  }
+
   render() {
     let { wcif, roundActivities } = this.props;
     let byVenue = _.groupBy(roundActivities, "venueId");
     let selectedId = this.state.selectedVenueId === null ? Object.keys(byVenue)[0] : this.state.selectedVenueId;
     let activities = byVenue[selectedId];
     return (
-      <div>
+        <div>
         <FormGroup controlId="formControlsSelect">
-          <ControlLabel>Select a venue (venue may have different timezone)</ControlLabel>
-          <FormControl componentClass="select" placeholder="select" onChange={e => { this.updateSelectedVenue(e.target.value) }}>
-            {Object.keys(byVenue).map((venueId) => {
-              let venueWcif = venueWcifFromId(wcif, venueId);
-              return (<option key={venueId} value={venueId}>{venueWcif.name}</option>);
-            })}
-          </FormControl>
+        <ControlLabel>Select a venue (venue may have different timezone)</ControlLabel>
+        <FormControl componentClass="select" placeholder="select" onChange={e => { this.updateSelectedVenue(e.target.value) }}>
+        {Object.keys(byVenue).map((venueId) => {
+                                                 let venueWcif = venueWcifFromId(wcif, venueId);
+                                                 return (<option key={venueId} value={venueId}>{venueWcif.name}</option>);
+                                               })}
+        </FormControl>
         </FormGroup>
+        <div id="calendar" />
         //a scheduler for each activity in the venue
         //actions to add nested activities
         //groups edition
-      </div>
-    );
+        </div>
+        );
   }
 }
 

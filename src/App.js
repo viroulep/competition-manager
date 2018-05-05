@@ -19,6 +19,8 @@ import { localesData } from './i18n'
 
 // npm rebuild node-sass
 import './scss/App.scss';
+import 'fullcalendar/dist/fullcalendar.min.css';
+import 'fullcalendar-scheduler/dist/scheduler.min.css';
 
 fontawesome.library.add(allIcons, allIconsRegular)
 
