@@ -4,3 +4,5 @@ en:
       date: "Date:"
       datespan: "From {startDate} to {endDate}."
       organizers: "Organizers"
+  groups:
+    missing_event: "Can't find this event for the competition."

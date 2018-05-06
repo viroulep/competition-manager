@@ -43,12 +43,14 @@ export function buildActivityCode(activity) {
 }
 
 export function roomWcifFromId(scheduleWcif, id) {
-  if (id.length > 0) {
+  // Make sure we use an Int
+  let roomId = parseInt(id, 10);
+  if (roomId !== undefined) {
     for (let i = 0; i < scheduleWcif.venues.length; i++) {
       let venue = scheduleWcif.venues[i];
       for (let j = 0; j < venue.rooms.length; j++) {
         let room = venue.rooms[j];
-        if (id == room.id) {
+        if (roomId === room.id) {
           return room;
         }
       }
@@ -58,12 +60,14 @@ export function roomWcifFromId(scheduleWcif, id) {
 }
 
 export function venueWcifFromRoomId(scheduleWcif, id) {
-  if (id.length > 0) {
+  // Make sure we use an Int
+  let roomId = parseInt(id, 10);
+  if (roomId !== undefined) {
     for (let i = 0; i < scheduleWcif.venues.length; i++) {
       let venue = scheduleWcif.venues[i];
       for (let j = 0; j < venue.rooms.length; j++) {
         let room = venue.rooms[j];
-        if (id == room.id) {
+        if (roomId === room.id) {
           return venue;
         }
       }
