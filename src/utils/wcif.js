@@ -2,6 +2,46 @@ import _ from 'lodash';
 
 let events = require("../data/events.json");
 
+
+const currentElementsIds = {
+  venue: 0,
+  room: 0,
+  activity: 0,
+};
+
+function recursiveMaxActivityId(activities) {
+  let allIds = _.map(activities, 'id');
+  let maxIdsNested = _.map(activities, function(a) {
+    return recursiveMaxActivityId(a.childActivities);
+  });
+  return Math.max(0, ...allIds, ...maxIdsNested);
+}
+
+export function initElementsIds(venues) {
+  // We may be called several time on different WCIF, so re-init everything
+  currentElementsIds.venue = 0;
+  currentElementsIds.room = 0;
+  currentElementsIds.activity = 0;
+  // Explore the WCIF to get the highest ids.
+  venues.forEach(function(venue, index) {
+    if (venue.id > currentElementsIds.venue) {
+      currentElementsIds.venue = venue.id;
+    }
+    venue.rooms.forEach(function(room, index) {
+      if (room.id > currentElementsIds.room) {
+        currentElementsIds.room = room.id;
+      }
+      currentElementsIds.activity = Math.max(currentElementsIds.activity, recursiveMaxActivityId(room.activities));
+    });
+  });
+  console.log(currentElementsIds);
+}
+
+export function newVenueId() { return ++currentElementsIds.venue; }
+export function newRoomId() { return ++currentElementsIds.room; }
+export function newActivityId() { return ++currentElementsIds.activity; }
+
+
 export function roundIdToString(roundId) {
   let { eventId, roundNumber } = parseActivityCode(roundId);
   let event = events.byId[eventId];

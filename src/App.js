@@ -16,6 +16,7 @@ import { BrowserRouter, Switch, Route, Redirect } from 'react-router-dom'
 
 import { IntlProvider } from 'react-intl';
 import { localesData } from './i18n'
+import { initElementsIds } from './utils/wcif';
 
 // npm rebuild node-sass
 import './scss/App.scss';
@@ -49,6 +50,9 @@ class App extends Component {
       wcif: props.wcif,
       wcifUpdater: new WcifUpdater(this),
     };
+    if (props.wcif) {
+      initElementsIds(props.wcif.schedule.venues);
+    }
   }
 
   render() {

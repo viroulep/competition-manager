@@ -2,11 +2,13 @@ import React, { Component } from 'react';
 import { Col, Row, FormGroup, FormControl, ControlLabel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
+import { Calendar } from 'fullcalendar';
+import 'fullcalendar-scheduler';
+
 import { RouteWithValidWcif, withWcif } from '../../wcif-context';
 import { t } from '../../i18n'
 import { getActivitiesForRound, venueWcifFromId, roomWcifFromId } from '../../utils/wcif';
-import { Calendar } from 'fullcalendar';
-import 'fullcalendar-scheduler';
+import { activityToFcEvent } from '../../utils/calendar';
 
 class GroupsNavRaw extends Component {
 
@@ -80,6 +82,8 @@ class GroupsForRoundRaw extends Component {
   }
 }
 
+
+
 class GroupsPanelFindANewName extends Component {
   // TODO: probably implement componentshouldrender, to prevent re-rendering on event add/rm/mv
   // TODO: look at "editable" "resourceEditable", etc
@@ -112,6 +116,7 @@ class GroupsPanelFindANewName extends Component {
     if (activities === undefined || activities.length === 0) {
       return;
     }
+    let venueWcif = venueWcifFromId(wcif, selectedId);
     let activitiesDate = new Date(activities[0].activity.startTime);
     let month = activitiesDate.getMonth() + 1;
     let day = activitiesDate.getDate();
@@ -131,26 +136,22 @@ class GroupsPanelFindANewName extends Component {
     let events = _.map(activities, function(o) {
       let a = o.activity;
       let eventsForActivity = [{
-        id: a.id,
+        ...a,
         resourceId: a.id,
-        title: a.name,
-        start: a.startTime,
-        end: a.endTime,
         editable: false,
       }];
       a.childActivities.forEach(function(child) {
         // TODO: check it's a group
         eventsForActivity.push({
-          id: child.id,
+          ...child,
           resourceId: a.id,
-          title: child.name.replace(a.name, ""),
-          start: child.startTime,
-          end: child.endTime,
+          name: child.name.replace(a.name, ""),
         });
       });
       return eventsForActivity;
     });
     events = _.flattenDeep(events);
+    let theMoment = new Calendar(null);
     let calendar = new Calendar(calendarEl, {
       defaultView: 'timelineDay',
       defaultDate: `${activitiesDate.getFullYear()}-${monthstr}-${daystr}`,
@@ -178,9 +179,10 @@ class GroupsPanelFindANewName extends Component {
       resources: resources,
       events: events,
       minTime: "07:00:00",
-      maxTime: "11:00:00",
+      maxTime: "13:00:00",
       slotDuration: "00:15:00",
       snapDuration: "00:05:00",
+      eventDataTransform: (eventData) => activityToFcEvent(eventData, venueWcif.timezone),
       select: function(start, end, jsEvent, view, resource) {
         console.log(
             'select',
@@ -203,6 +205,7 @@ class GroupsPanelFindANewName extends Component {
   render() {
     let { wcif, roundActivities } = this.props;
     let byVenue = _.groupBy(roundActivities, "venueId");
+    console.log("RENDER");
     return (
       <div>
         <FormGroup controlId="formControlsSelect">

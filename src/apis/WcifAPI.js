@@ -1,3 +1,5 @@
+import { initElementsIds } from '../utils/wcif';
+
 export class WcifUpdater {
   constructor(component) {
     this.holder = component;
@@ -16,6 +18,7 @@ export class WcifUpdater {
     this.holder.setState({
       wcif: newWcif,
     }, callback);
+    initElementsIds(newWcif.schedule.venues);
   }
 }
 
